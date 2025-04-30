@@ -24,6 +24,12 @@
   </div>
 
   <QrScanner v-if="showCamera" @scanned="getScanned" @close="close"></QrScanner>
+  <FriendConfirmModal
+    v-if="qrData"
+    :card="qrData"
+    @cancel="cancel"
+    @confirm="confirm"
+  ></FriendConfirmModal>
 </template>
 
 <script setup>
@@ -31,6 +37,11 @@ import { ref, onMounted } from "vue";
 import QRCode from "qrcode";
 
 import QrScanner from "../components/QrScanner.vue";
+import FriendConfirmModal from "../components/FriendConfirmModal.vue";
+
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const myData = ref({
   name: "張三",
@@ -40,6 +51,7 @@ const myData = ref({
 });
 const qrcode = ref("");
 const showCamera = ref(false);
+const qrData = ref(null);
 
 function scanQr() {
   alert("這裡可以觸發 QRCode 掃描功能");
@@ -48,11 +60,20 @@ function scanQr() {
 
 function getScanned(res) {
   console.log(res);
+  qrData.value = res;
 }
 
 function close() {
   console.log("close");
   showCamera.value = false;
+}
+
+function cancel() {
+  qrData.value = null;
+}
+
+function confirm() {
+  router.push({ name: "list" });
 }
 
 onMounted(() => {
