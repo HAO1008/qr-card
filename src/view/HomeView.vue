@@ -1,5 +1,5 @@
 <template>
-  <div class="card-app">
+  <div v-if="!showCamera" class="card-app">
     <!-- 名片區塊 -->
     <div class="card">
       <img
@@ -8,11 +8,11 @@
 "
         alt="Avatar"
       />
-      <div class="info">
+      <div class="info" v-if="myData">
         <h2>{{ myData.name }}</h2>
-        <p>{{ myData.title }}</p>
-        <p>{{ myData.company }}</p>
-        <p>{{ myData.phone }}</p>
+        <p>職稱: {{ myData.title }}</p>
+        <p>公司: {{ myData.company }}</p>
+        <p>電話: {{ myData.phone }}</p>
       </div>
     </div>
 
@@ -35,6 +35,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import QRCode from "qrcode";
+import mitt from "mitt";
 
 import QrScanner from "../components/QrScanner.vue";
 import FriendConfirmModal from "../components/FriendConfirmModal.vue";
@@ -43,15 +44,11 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const myData = ref({
-  name: "張三",
-  title: "工程師",
-  phone: "0900-000-000",
-  company: "ABC 公司",
-});
+const myData = ref(null);
 const qrcode = ref("");
 const showCamera = ref(false);
 const qrData = ref(null);
+const emitter = mitt();
 
 function scanQr() {
   alert("這裡可以觸發 QRCode 掃描功能");
@@ -74,9 +71,13 @@ function cancel() {
 
 function confirm() {
   router.push({ name: "list" });
+  emitter.emit("add-friend", qrData.value);
 }
 
 onMounted(() => {
+  let myCard = localStorage.getItem("myCard");
+  myData.value = JSON.parse(myCard);
+
   QRCode.toDataURL(JSON.stringify(myData.value))
     .then((url) => {
       console.log(url);
@@ -116,9 +117,14 @@ onMounted(() => {
   object-fit: cover;
 }
 
+.info {
+  text-align: left;
+}
+
 .info h2 {
   margin: 0 0 4px;
   font-size: 1.4rem;
+  color: #333;
 }
 
 .info p {
@@ -148,5 +154,31 @@ onMounted(() => {
 .qrcode-box .qrcode {
   width: 100px;
   height: 100px;
+}
+
+@media (max-width: 780px) {
+  .card-app {
+    width: 300px;
+  }
+
+  .card {
+    flex-direction: column;
+  }
+
+  .info {
+    text-align: center;
+  }
+
+  .qrcode-box {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qrcode-box .qrcode {
+    width: 200px;
+    height: 200px;
+    margin-top: 25px;
+  }
 }
 </style>

@@ -15,7 +15,10 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import mitt from "mitt";
+
+const emitter = mitt();
 
 const friends = ref([
   {
@@ -47,6 +50,14 @@ const friends = ref([
 function deleteFriend(id) {
   friends.value = friends.value.filter((f) => f.id !== id);
 }
+
+onMounted(() => {
+  emitter.on("add-friend", (res) => {
+    res["id"] = friends.value.length + 1;
+    res["avatar"] = "https://picsum.photos/id/870/200/300";
+    friends.value.push(res);
+  });
+});
 </script>
 
 <style scoped>
