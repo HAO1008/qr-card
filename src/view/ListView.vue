@@ -16,9 +16,7 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import mitt from "mitt";
-
-const emitter = mitt();
+import { emitter } from "../mitt/mitt";
 
 const friends = ref([
   {

@@ -35,7 +35,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import QRCode from "qrcode";
-import mitt from "mitt";
+import { emitter } from "../mitt/mitt";
 
 import QrScanner from "../components/QrScanner.vue";
 import FriendConfirmModal from "../components/FriendConfirmModal.vue";
@@ -48,7 +48,6 @@ const myData = ref(null);
 const qrcode = ref("");
 const showCamera = ref(false);
 const qrData = ref(null);
-const emitter = mitt();
 
 function scanQr() {
   alert("這裡可以觸發 QRCode 掃描功能");
