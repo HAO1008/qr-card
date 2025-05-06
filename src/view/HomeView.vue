@@ -35,7 +35,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import QRCode from "qrcode";
-import { emitter } from "../mitt/mitt";
+
+import useFriendStore from "../stores/friendStore";
 
 import QrScanner from "../components/QrScanner.vue";
 import FriendConfirmModal from "../components/FriendConfirmModal.vue";
@@ -43,6 +44,8 @@ import FriendConfirmModal from "../components/FriendConfirmModal.vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+const friendStore = useFriendStore();
+const { addFriend, friendList } = friendStore;
 
 const myData = ref(null);
 const qrcode = ref("");
@@ -69,8 +72,13 @@ function cancel() {
 }
 
 function confirm() {
+  const newFrend = {
+    ...qrData.value,
+    id: friendList.length + 1,
+    avatar: "https://picsum.photos/id/870/200/300",
+  };
+  addFriend(newFrend);
   router.push({ name: "list" });
-  emitter.emit("add-friend", qrData.value);
 }
 
 onMounted(() => {

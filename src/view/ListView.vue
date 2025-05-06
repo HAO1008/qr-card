@@ -1,7 +1,7 @@
 <template>
   <div class="friend-list">
     <h1>好友列表</h1>
-    <div v-for="friend in friends" :key="friend.id" class="friend-card">
+    <div v-for="friend in friendList" :key="friend.id" class="friend-card">
       <img class="avatar" :src="friend.avatar" alt="avatar" />
       <div class="info">
         <h2>{{ friend.name }}</h2>
@@ -11,51 +11,21 @@
       </div>
       <button class="delete-btn" @click="deleteFriend(friend.id)">刪除</button>
     </div>
+    <div v-if="friendList.length == 0" class="friend-card">你這邊緣人~</div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import { emitter } from "../mitt/mitt";
+import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
 
-const friends = ref([
-  {
-    id: 1,
-    name: "張三",
-    title: "工程師",
-    company: "ABC 公司",
-    phone: "0900-000-000",
-    avatar: "https://picsum.photos/200/300?grayscale",
-  },
-  {
-    id: 2,
-    name: "李四",
-    title: "設計師",
-    company: "XYZ 公司",
-    phone: "0911-222-333",
-    avatar: "https://picsum.photos/200/300/",
-  },
-  {
-    id: 3,
-    name: "王五",
-    title: "產品經理",
-    company: "ACME 公司",
-    phone: "0988-123-456",
-    avatar: "https://picsum.photos/id/870/200/300",
-  },
-]);
+import useFriendStore from "../stores/friendStore";
 
-function deleteFriend(id) {
-  friends.value = friends.value.filter((f) => f.id !== id);
-}
+const friendStore = useFriendStore();
+const { deleteFriend } = friendStore;
+const { friendList } = storeToRefs(friendStore);
 
-onMounted(() => {
-  emitter.on("add-friend", (res) => {
-    res["id"] = friends.value.length + 1;
-    res["avatar"] = "https://picsum.photos/id/870/200/300";
-    friends.value.push(res);
-  });
-});
+onMounted(() => {});
 </script>
 
 <style scoped>
@@ -81,6 +51,7 @@ onMounted(() => {
   padding: 16px;
   margin-bottom: 16px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  color: #cfcfcf;
 }
 
 .avatar {
